@@ -31,7 +31,7 @@ export const sendOTPVerificationEmail = async ({ id, email }, req: any, res: any
     const hashedOTP = await bcrypt.hash(otp, saltRounds);
     await Manager.save(OTP, {
       otp : hashedOTP,
-      userId: id,
+      user_id: id,
       expiresAt: new Date(Date.now() + 3600000),
     })
 
@@ -82,7 +82,7 @@ export const verifyOTP = async (req: Request, res: Response) => {
         return res.status(404).json({ msg: "User not found" });
       }
 
-      const otpToken = await Manager.findOneBy(OTP, { userId: new ObjectId(idUser) });
+      const otpToken = await Manager.findOneBy(OTP, { user_id: new ObjectId(idUser) });
 
       if (!otpToken) {
         throw new Error("User doesn't have an OTP token");
@@ -134,14 +134,15 @@ export const verifyOTP = async (req: Request, res: Response) => {
 };
 
 export const resendOTPVerification = async (req: Request, res: Response) => {
-  const {idUser,email} = req.body;
+  const {email} = req.body;
+  const idUser = await Manager.findOneBy(User, { email: email });
   try {
     if(!idUser || !email) {
-      throw new Error("Empty email is not allowed");
+      throw new Error("User tidak ada atau belum");
     }
 
-    await Manager.delete(OTP, { userId: new ObjectId(idUser) });
-    await sendOTPVerificationEmail({ id: idUser, email }, req, res);
+    await Manager.delete(OTP, { userId: new ObjectId(idUser._id) });
+    await sendOTPVerificationEmail({ id: idUser._id, email }, req, res);
   } catch (error) {
     res.json({
       status : "FAILED",

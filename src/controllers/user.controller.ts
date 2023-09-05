@@ -54,6 +54,7 @@ export const Register = async(req : Request,res : Response) => {
         });
 
         try {
+            
             await Manager.save(user);
             let data = {
                 id: user._id,

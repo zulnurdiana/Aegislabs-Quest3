@@ -11,7 +11,7 @@ export class OTP {
     otp: string;
 
     @Column('text')
-    userId?: ObjectId;
+    user_id?: ObjectId;
 
     @Column()
     email?: string;
