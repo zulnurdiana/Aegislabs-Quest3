@@ -1,0 +1,40 @@
+
+
+POST http://localhost:3001/users
+Content-Type: application/json
+
+{
+"nama" : "user",
+"email" : "user@gmail.com",
+"password" : "123",
+"confPassword" : "123"
+}
+
+###
+GET http://localhost:3001/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZTRiNjE3ODQyNzcyOWIwZjY0OTJiYyIsIm5hbWEiOiJadWxmaWthciIsImVtYWlsIjoiWnVsZmlrYXJAZ21haWwuY29tIiwiaWF0IjoxNjkyNzc3NzI0LCJleHAiOjE2OTI3Nzc3Mzl9.kkTqwya1qSGV3PUmGNEeSsoYTW6d2fmWXyWXDuCLXhk
+###
+POST http://localhost:3001/login
+Content-Type: application/json
+
+{
+  "email" : "Zulfikar@gmail.com",
+  "password" : "123"
+}
+
+###
+DELETE http://localhost:3001/logout
+
+###
+GET http://localhost:3001/products
+
+
+###
+
+POST http://localhost:3001/products
+Content-Type: application/json
+
+{
+"nama_produk" : "Product baru zulfikar",
+"price" : 1000
+}
