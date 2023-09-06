@@ -27,9 +27,15 @@ export const getAllProductByUsers = async (req : Request, res : Response) => {
 export const getSingleProductById = async (req : Request, res : Response) => {
     const {id} = req.params;
     try {
-    const Products = await Manager.findOneBy(Product, {_id : new ObjectId(id)});
-    if(!Products) return res.status(404).json({msg : `Product with id ${id} not found`});
-    res.status(200).json(Products);
+    const product = await Manager.findOneBy(Product, {_id : new ObjectId(id)});
+    if(!product) return res.status(404).json({msg : `Product with id ${id} not found`});
+
+     if (req.xhr || req.headers.accept.indexOf("json") > -1) {
+      res.status(200).json(product);
+    } else {
+      res.render("detailProduct.ejs", { product });
+    }
+   
     } catch (error) {
         
     }
@@ -40,13 +46,15 @@ export const getSingleProductById = async (req : Request, res : Response) => {
 export const createProduct = async (req : Request, res : Response) => {
     const schema = Joi.object({
         nama_produk : Joi.string().required(),
+        description : Joi.string().required(),
         price : Joi.number().required(),
+        
     })
     const {error} = schema.validate(req.body);
     if(error){ 
         return res.status(400).json({msg : error.details[0].message});
     }
-    const {nama_produk, price} = req.body;
+    const {nama_produk, price, description} = req.body;
     if(!nama_produk) return res.status(400).json({msg: "Nama produk tidak boleh kosong"});
     if(!price) return res.status(400).json({msg: "Harga tidak boleh kosong"});
 
@@ -63,6 +71,7 @@ export const createProduct = async (req : Request, res : Response) => {
     try {   
         const product = new Product({
                 nama_produk: nama_produk,
+                description : description,
                 price: price,
                 img_url: fullURL,
                 user_id: Users._id

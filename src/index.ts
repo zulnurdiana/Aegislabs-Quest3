@@ -14,31 +14,10 @@ import socketIo from "socket.io";
 import path = require("path");
 
 
-
-
 dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 3001;
-const server = http.createServer(app);
-const io = new socketIo.Server(server, {
-    cors: {
-        origin: 'http://localhost:3001', // Gantilah sesuai dengan alamat frontend Anda
-        methods: ['GET', 'POST'],
-        credentials: true,
-    },
-});
-io.on('connection', (socket) => {
-    console.log('Klien terhubung ke WebSocket');
-
-    // Handler ketika klien menutup koneksi WebSocket
-    socket.on('disconnect', () => {
-        console.log('Klien terputus dari WebSocket');
-    });
-});
-
-export const sendNotificationToClients= (data: any)=> {
-    io.emit('notification', data);
-}
 
 app.use(cors())
 app.use(express.json());
@@ -51,7 +30,6 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
-
 app.use("/upload",express.static("upload"))
 app.use(express.static('public'));
 

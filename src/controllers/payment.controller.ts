@@ -3,7 +3,6 @@ import { Product } from "../entity/Product";
 import { Manager } from "../utils/Manager";
 import { ObjectId } from "mongodb";
 import dotenv from "dotenv"
-import { sendNotificationToClients } from "..";
 dotenv.config();
 
 import Stripe from 'stripe';
@@ -37,8 +36,7 @@ export const checkout = async (req : Request, res : Response) => {
         success_url: "http://localhost:3001/order/success", 
         cancel_url: "http://localhost:3000/cancel", 
     }); 
-     // Mengirim notifikasi ke semua klien terhubung
-    sendNotificationToClients({ message: 'Pembayaran berhasil' });
+   
 
     res.json({ id: session.id, message: "Pembayaran berhasil. Terima kasih atas pesanan Anda!", url : session.url }); 
 }
@@ -67,22 +65,18 @@ export const webhook = async (request: Request, response: Response) => {
     case 'checkout.session.completed':
         const checkoutSessionCompleted = event.data.object;
         console.log('Checkout berhasil selesai:', checkoutSessionCompleted);
-        sendNotificationToClients({ type: 'checkout_completed', data: checkoutSessionCompleted });
         break;
     case 'checkout.session.expired':
         const checkoutSessionExpired = event.data.object;
         console.log('Checkout telah kedaluwarsa:', checkoutSessionExpired);
-        sendNotificationToClients({ type: 'checkout_expired', data: checkoutSessionExpired });
         break;
     case 'payment_intent.succeeded':
         const paymentIntentSucceeded = event.data.object;
         console.log('Payment Intent berhasil:', paymentIntentSucceeded);
-        sendNotificationToClients({ type: 'payment_intent_succeeded', data: paymentIntentSucceeded });
         break;
     case 'payment_intent.payment_failed':
         const paymentIntentPaymentFailed = event.data.object;
         console.log('Payment Intent gagal:', paymentIntentPaymentFailed);
-        sendNotificationToClients({ type: 'payment_intent_payment_failed', data: paymentIntentPaymentFailed });
         break;
     // ... Anda dapat menambahkan penanganan untuk jenis peristiwa lainnya di sini
     default:

@@ -1,9 +1,17 @@
 import express from "express";
+import { Product } from "../entity/Product";
+import { Manager } from "../utils/Manager";
 
 const routerEJS = express.Router();
 
 routerEJS.get("/",async (req, res) => {
   res.render("login.ejs");
+})
+
+
+routerEJS.get("/dashboard",async (req, res) => {
+  const products = await Manager.find(Product);
+  res.render("dashboard.ejs", {products})
 })
 
 routerEJS.get("/register",async (req, res) => {
