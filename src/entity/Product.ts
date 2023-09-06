@@ -18,6 +18,8 @@ export class Product {
     @Column('text')
     user_id?: ObjectId;
 
+    
+
 
     constructor(data: Partial<Product>) {
         Object.assign(this, data);

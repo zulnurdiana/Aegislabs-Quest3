@@ -38,25 +38,19 @@ export const sendOTPVerificationEmail = async ({ id, email }, req: any, res: any
 
     await transporter.sendMail(mailOptions);
 
-    res.json({
+
+     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      res.json({
       msg: "Verification code has been sent please check your email",
       data: {
         userId: id,
         email,
       },
-    })
-
-    // if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-    //   res.json({
-    //   msg: "Verification code has been sent please check your email",
-    //   data: {
-    //     userId: id,
-    //     email,
-    //   },
-    // });
-    // } else {
-    //  res.redirect("/verify_otp");
-    // }
+    });
+    } else {
+     res.redirect("/verify_otp");
+    }
+    
     
     
    
@@ -106,23 +100,22 @@ export const verifyOTP = async (req: Request, res: Response) => {
       user.verified = true;
       await Manager.save(User, user);
 
+      delete req.session['idUser'];
 
       // Remove OTP token
       await Manager.delete(OTP, { idUser: new ObjectId(idUser) });
 
-       res.json({
+       
+       
+      if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        res.json({
         status: "VERIFIED",
         msg: "User email has been verified",
      
        })
-       
-      // if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-       
-      // });
-      // } else {
-      // res.redirect("/login");
-      // }
-
+      } else {
+         res.redirect("/");
+      };
       
     }
   } catch (error) {

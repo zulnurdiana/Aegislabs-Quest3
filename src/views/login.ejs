@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <title>Login</title>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded shadow-md w-96">
+    <h1 class="text-2xl font-semibold mb-4">Login</h1>
+    <div id="login-message" class="text-red-500 mt-2">
+      <% if (typeof errorMessage !=='undefined' ) { %>
+        <p>
+          <%= errorMessage %>
+        </p>
+        <% } %>
+    </div>
+    <form action="/login" method="POST">
+      <div class="mb-4">
+        <label for="email" class="block text-gray-600">Email</label>
+        <input type="email" name="email" id="email" class="border border-gray-300 p-2 w-full rounded">
+      </div>
+      <div class="mb-4">
+        <label for="password" class="block text-gray-600">Password</label>
+        <input type="password" name="password" id="password" class="border border-gray-300 p-2 w-full rounded">
+      </div>
+      <button type="submit" id="login-button"
+        class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Login</button>
+      <button onclick="window.location.href='/register'"
+        class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+        Daftar
+      </button>
+    </form>
+  </div>
+
+
+  <script>
+    document.querySelector('form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+
+      if (response.status === 200) {
+
+        window.location.href = '/posting';
+
+      } else {
+
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+
+          if (data.msg) {
+            const errorMessageContainer = document.getElementById('login-message');
+            errorMessageContainer.innerHTML = `<p>${data.msg}</p>`;
+          }
+        } else {
+          const errorMessageContainer = document.getElementById('login-message');
+          errorMessageContainer.innerHTML = `<p>${await response.text()}</p>`;
+        }
+      }
+    });
+  </script>
+
+</body>
+
+</html>

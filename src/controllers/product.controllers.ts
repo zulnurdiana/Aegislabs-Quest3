@@ -5,8 +5,8 @@ import { Manager } from "../utils/Manager";
 import fs from "fs"
 import { ObjectId } from "mongodb";
 import Joi from "joi";
-
-
+import dotenv from "dotenv"
+dotenv.config();
 
 
 export const getAllProductByUsers = async (req : Request, res : Response) => {

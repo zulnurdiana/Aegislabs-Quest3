@@ -7,7 +7,7 @@ const routerUser = express.Router();
 
    routerUser.get("/users",verifyToken,getAllUsers)
    routerUser.get("/users/:id",getUsersById)
-   routerUser.post("/users",Register)
+   routerUser.post("/register",Register)
    routerUser.post("/login", Login)
    routerUser.get("/token", refreshToken)
    routerUser.delete("/logout",Logout)

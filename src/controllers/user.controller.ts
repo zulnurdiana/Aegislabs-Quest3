@@ -54,8 +54,8 @@ export const Register = async(req : Request,res : Response) => {
         });
 
         try {
-            
             await Manager.save(user);
+            req.session['idUser'] = user._id;
             let data = {
                 id: user._id,
                 email: user.email,
