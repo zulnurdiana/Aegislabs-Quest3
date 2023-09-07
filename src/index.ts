@@ -9,6 +9,7 @@ import routerOTP from "./routes/otp.route";
 import routerEJS from "./routes/ejs.route";
 import routerPayment from "./routes/payment.route";
 import session from "express-session"
+import bodyParser from "body-parser";
 import http from "http"
 import socketIo from "socket.io";
 import path = require("path");
@@ -20,7 +21,14 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors())
-app.use(express.json());
+
+app.use((req, res, next) => {
+  if (req.originalUrl === '/webhook') {
+    next(); 
+  } else {
+    express.json()(req, res, next); 
+  }
+});
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.set('view engine', 'ejs');

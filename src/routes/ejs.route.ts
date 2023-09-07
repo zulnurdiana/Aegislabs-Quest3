@@ -8,6 +8,12 @@ routerEJS.get("/",async (req, res) => {
   res.render("login.ejs");
 })
 
+routerEJS.get("/success",async (req, res) => {
+  res.render("success.ejs");
+})
+routerEJS.get("/failed",async (req, res) => {
+  res.render("failed.ejs");
+})
 
 routerEJS.get("/dashboard",async (req, res) => {
   const products = await Manager.find(Product);

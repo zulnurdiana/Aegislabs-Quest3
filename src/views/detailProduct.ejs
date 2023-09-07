@@ -15,38 +15,37 @@
     <a href="/dashboard" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Kembali</a>
   </div>
 
-  <% if (product) { %>
-    <div class="bg-white rounded-lg shadow-md overflow-hidden">
-      <% if (product.img_url) { %>
-        <img src="<%= product.img_url %>" alt="Gambar Produk" class="w-full h-[30%] object-cover">
-        <% } %>
-          <div class="p-4">
-            <h2 class="text-2xl font-semibold mb-2 text-gray-800" id="nama_produk">
-              <%= product.nama_produk %>
-            </h2>
-            <h3 class="text-xl font-semibold text-green-500" id="price">
-              Rp <%= product.price %>
-            </h3>
-            <p class="mt-4 text-gray-600" id="description">
-              <%= product.description %>
-            </p>
-            <!-- Tombol Checkout -->
-            <form action="/checkout/<%= product._id %>" method="POST" class="mt-4 text-center"
-              data-product='<%= JSON.stringify(product) %>'>
-              <div class="mb-4">
-                <label for="quantity" class="block text-gray-700 font-semibold mb-2">Jumlah:</label>
-                <input type="number" id="quantity" name="quantity" value="1" min="1"
-                  class="w-16 px-2 py-1 border rounded focus:outline-none focus:ring focus:border-blue-300">
-              </div>
-              <button type="submit"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Checkout</button>
-            </form>
-          </div>
-    </div>
-
-    <% } else { %>
-      <p class="text-red-500">Produk tidak ditemukan.</p>
+<% if (product) { %>
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <% if (product.img_url) { %>
+      <img src="<%= product.img_url %>" alt="Gambar Produk" class="w-full h-[300px] object-cover">
       <% } %>
+        <div class="p-6">
+          <h2 class="text-2xl font-semibold text-gray-800" id="nama_produk">
+            <%= product.nama_produk %>
+          </h2>
+          <h3 class="text-xl font-semibold text-green-500 mt-2" id="price">
+            Rp <%= product.price %>
+          </h3>
+          <p class="mt-4 text-gray-600" id="description">
+            <%= product.description %>
+          </p>
+          <!-- Tombol Checkout -->
+          <form action="/checkout/<%= product._id %>" method="POST" class="mt-4 text-center"
+            data-product='<%= JSON.stringify(product) %>'>
+            <div class="mb-4">
+              <label for="quantity" class="block text-gray-700 font-semibold mb-2">Jumlah:</label>
+              <input type="number" id="quantity" name="quantity" value="1" min="1"
+                class="w-20 px-3 py-2 border rounded focus:outline-none focus:ring focus:border-blue-300">
+            </div>
+            <button type="submit"
+              class="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">Checkout</button>
+          </form>
+        </div>
+  </div>
+  <% } else { %>
+    <p class="text-red-500 text-center mt-4">Produk tidak ditemukan.</p>
+    <% } %>
 
         <script>
           document.addEventListener('submit', async (e) => {
