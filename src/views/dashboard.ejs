@@ -16,10 +16,6 @@
       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Logout</button>
   </div>
 
-  <button onclick="window.location.href='/addProduct'"
-    class="bg-lime-500 mb-4 text-white py-2 px-4 rounded hover:bg-lime-600">
-    Tambah Produk
-  </button>
 
   <div class="grid grid-cols-4 gap-4">
     <% if (products.length> 0) { %>
@@ -34,7 +30,7 @@
                     <%= product.nama_produk %>
                   </h2>
                   <h3 class="text-green-500 my-2">
-                    Rp <%= product.price %>
+                    SGD <%= product.price %>
                   </h3>
                   <p class="text-justify">
                     <%= product.description %>

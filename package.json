@@ -38,6 +38,7 @@
       "raw-body": "^2.5.2",
       "reflect-metadata": "^0.1.13",
       "socket.io": "^4.7.2",
+      "socket.io-client": "^4.7.2",
       "stripe": "^13.4.0",
       "typeorm": "0.3.17"
    },

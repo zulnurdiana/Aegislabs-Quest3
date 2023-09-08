@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { Product } from "../entity/Product";
 import { Manager } from "../utils/Manager";
 import { ObjectId } from "mongodb";
-import getRawBody from "raw-body";
 import dotenv from "dotenv"
 dotenv.config();
+
 
 import Stripe from 'stripe';
 
@@ -23,7 +23,7 @@ export const checkout = async (req : Request, res : Response) => {
         line_items: [ 
         { 
             price_data: { 
-            currency: "usd", 
+            currency: "sgd", 
             product_data: { 
                 name: product.nama_produk, 
               
@@ -49,37 +49,42 @@ export const webhook = async (request: Request, response: Response) => {
   const sig = request.headers['stripe-signature'];
   let event: any;
 
-// const rawBody = JSON.stringify(request.body);
- const rawBody = request.body.toString()
+  const rawBody = request.body.toString()
  
   try {
-   
     event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_KEY);
-    console.log("berhasil webhook");
   } catch (err) {
-    console.log("error karena : ", err.message);
     response.status(400).send(`Webhook Error: ${err.message}`);
     return;
   }
 
   switch (event.type) {
-    case 'checkout.session.async_payment_succeeded':
-      const checkoutSessionAsyncPaymentSucceeded = event.data.object;
-      if(checkoutSessionAsyncPaymentSucceeded){
-         console.log("berhasil checkout");
+      case 'charge.succeeded':
+      const chargeSucceeded = event.data.object;
+      if(chargeSucceeded){
+        console.log("berhasil charge");
       }
       break;
-     case 'checkout.session.completed':
+      case 'checkout.session.completed':
       const checkoutSessionCompleted = event.data.object;
       if(checkoutSessionCompleted){
-         console.log("berhasil checkout completed");
+        console.log("berhasil checkout");
       }
       break;
-    // ... handle other event types
+      case 'payment_intent.created':
+      const paymentIntentCreated = event.data.object;
+      if(paymentIntentCreated){
+       console.log("berhasil payment created");
+      }
+      break;
+      case 'payment_intent.succeeded':
+      const paymentIntentSucceeded = event.data.object;
+      if(paymentIntentSucceeded){
+        console.log("berhasil payment success");
+      }
+      break;
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
 
-  // Return a 200 response to acknowledge receipt of the event
-  response.status(200).json({ received: true });
 }
