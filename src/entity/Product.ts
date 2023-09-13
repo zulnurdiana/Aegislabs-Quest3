@@ -21,7 +21,8 @@ export class Product {
     @Column('text')
     user_id?: ObjectId;
 
-    
+    @Column()
+    stock: number;
 
 
     constructor(data: Partial<Product>) {

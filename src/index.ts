@@ -9,10 +9,13 @@ import routerOTP from "./routes/otp.route";
 import routerEJS from "./routes/ejs.route";
 import routerPayment from "./routes/payment.route";
 import session from "express-session"
-import bodyParser from "body-parser";
-import http from "http"
-import socketIo from "socket.io";
 import path = require("path");
+import cron from "node-cron";
+import { Manager } from "./utils/Manager";
+import { Order } from "./entity/Order";
+import { LessThan, MoreThan } from "typeorm";
+
+
 
 
 dotenv.config();
@@ -24,9 +27,9 @@ app.use(cors())
 
 app.use((req, res, next) => {
   if (req.originalUrl === '/webhook') {
-    next(); 
+    next();
   } else {
-    express.json()(req, res, next); 
+    express.json()(req, res, next);
   }
 });
 app.use(express.urlencoded({ extended: true }));
@@ -34,23 +37,43 @@ app.use(cookieParser());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(session({
-  secret: 'rahasia', 
+  secret: 'rahasia',
   resave: false,
   saveUninitialized: false,
 }));
-app.use("/upload",express.static("upload"))
+app.use("/upload", express.static("upload"))
 app.use(express.static('public'));
 
+
+
+
 AppDataSource.initialize().then(async () => {
-    app.use(routerUser)
-    app.use(routerProduct)
-    app.use(routerOTP)
-    app.use(routerPayment)
-    app.use(routerEJS)
+  app.use(routerUser)
+  app.use(routerProduct)
+  app.use(routerOTP)
+  app.use(routerPayment)
+  app.use(routerEJS)
+
+  cron.schedule('* */30 * * * *', async () => {
+  const expiredOrders = await Manager.find(Order, {
+    where: {
+      status: 'Pending',
+    },
+  });
 
 
-    app.listen(port, () => {
-        console.log(`server running at http://localhost:${port}`);
-    })
-   
+  for (const order of expiredOrders) {
+    console.log(`Membatalkan pesanan dengan ID ${order._id}`);
+    order.status = 'Cancelled';
+    await Manager.save(Order, order);
+  }
+
+  console.log('Cron job: Pesanan yang melebihi 30 menit telah dibatalkan.');
+});
+
+
+  app.listen(port, () => {
+    console.log(`server running at http://localhost:${port}`);
+  })
+
 }).catch(error => console.log(error))
