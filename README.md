@@ -105,7 +105,7 @@ Follow this step to run this repository code in your local device:
 
 <!-- Usage -->
 ## :eyes: Usage
-  After you running the server you can testing it at postman, you can see our <a href="https://documenter.getpostman.com/view/18895824/2s9YC5xC1s">**API Documentation**</a> for more detail 
+  After you running the server you can testing it at postman, you can see our <a href="https://documenter.getpostman.com/view/18895824/2s9YC5xsMp">**API Documentation**</a> for more detail 
 
 <!-- TechStack -->
 ### :space_invader: Tech Stack
