@@ -13,7 +13,7 @@ import path = require("path");
 import cron from "node-cron";
 import { Manager } from "./utils/Manager";
 import { Order } from "./entity/Order";
-import { LessThan, MoreThan } from "typeorm";
+import { processOrderQueue } from "./controllers/payment.controller";
 
 
 
@@ -53,6 +53,11 @@ AppDataSource.initialize().then(async () => {
   app.use(routerOTP)
   app.use(routerPayment)
   app.use(routerEJS)
+
+  // cron.schedule('*/20 * * * * *', async () => {
+  // await processOrderQueue();
+  //   });
+  
 
   cron.schedule('* */30 * * * *', async () => {
   const expiredOrders = await Manager.find(Order, {

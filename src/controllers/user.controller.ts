@@ -105,6 +105,7 @@ export const Login = async(req : Request,res : Response) => {
                 httpOnly : true,
                 maxAge : 24 * 60 * 60 * 1000
             })
+            req.session['userId'] = Users._id;
             res.json({accessToken})
         } catch (error) {
             console.log(error.message);

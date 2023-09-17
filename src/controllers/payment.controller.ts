@@ -13,11 +13,16 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2023-08-16',
 });
 
-const orderQueue = [];
+
+
+
 
 export const checkout = async (req : Request, res : Response) => {
     const {quantity} = req.body;
     const {idProduct} = req.params;
+    const userId = req.session['userId'];
+    if(!userId) return res.status(404).json({msg : `login first`});
+
     const product = await Manager.findOneBy(Product, {_id : new ObjectId(idProduct)})
     if(!product) return res.status(404).json({msg : `Product with id ${idProduct} not found`});
 
@@ -39,16 +44,13 @@ export const checkout = async (req : Request, res : Response) => {
         }, 
         ], 
         mode: "payment", 
-        success_url: "http://localhost:3001/success", 
+       success_url: product.stock >= quantity ? "http://localhost:3001/success" : "http://localhost:3001/failed",
         cancel_url: "http://localhost:3001/failed", 
     }); 
 
-    // Hitung total harga pesanan
     const totalAmount = product.price * quantity;
-
-    // Buat objek pesanan baru
     const order = new Order({
-        user_id : product.user_id,
+        user_id : userId,
         product_id : new ObjectId(idProduct),
         session_id : session.id,
         status : "Pending",
@@ -58,33 +60,42 @@ export const checkout = async (req : Request, res : Response) => {
 
     });
 
-    orderQueue.push(order);
-   
-    // Simpan pesanan
+
     await Manager.save(Order, order);
    
 
     res.json({ id: session.id, message: "Pembayaran berhasil. Terima kasih atas pesanan Anda!", url : session.url }); 
 }
 
-export const processOrderQueue = async () => {
-  while (orderQueue.length > 0) {
-    const order = orderQueue[0]; // Ambil pesanan pertama
-    const product = await Manager.findOneBy(Product, { _id: new ObjectId(order.product_id )});
 
-    // Periksa stok produk sebelum memproses pesanan
+
+//  Menggunakan queue FIFO (first in first out)
+export const processOrderQueue = async () => {
+    const orderQueue = await Manager.find(Order,{
+      where : {
+        status : "Pending"
+      }
+    })
+
+
+ if (orderQueue.length > 0) {
+    const order = orderQueue[0];
+    const product = await Manager.findOneBy(Product, { _id: new ObjectId(order.product_id )});
     if (product.stock < order.quantity) {
-      console.log(`Stok produk ${product.nama_produk} tidak mencukupi. Pesanan dibatalkan.`);
-      orderQueue.shift(); // Hapus pesanan dari antrian
+      console.log(`🔔 Stok produk ${product.nama_produk} tidak mencukupi. Pesanan dibatalkan.`);
+      order.status = "Stock habis"
+      order.totalAmount = 0;
+      await Manager.save(Order, order);
+      orderQueue.shift();
+      return;
     } else {
-      // Proses pesanan (misalnya, kurangi stok produk)
-      console.log(`Memproses pesanan untuk produk ${product.nama_produk}`);
+      console.log(`✅ Pesanan ${product.nama_produk} berhasil dibeli dengan jumlah ${order.quantity}`);
       product.stock -= order.quantity;
       await Manager.save(Product, product);
       order.status = "Success";
       await Manager.save(Order, order);
-
       orderQueue.shift();
+      return;
     }
   }
 };
@@ -108,35 +119,26 @@ export const webhook = async (request: Request, response: Response) => {
       case 'charge.succeeded':
       const chargeSucceeded = event.data.object;
       if(chargeSucceeded){
-        console.log("berhasil charge");
+
       }
       break;
       case 'checkout.session.completed':
       const checkoutSessionCompleted = event.data.object;
       if(checkoutSessionCompleted){
-        console.log("berhasil checkout");
-         const order = await Manager.findOneBy(Order, {session_id : checkoutSessionCompleted.id});
-         const product = await Manager.findOneBy(Product, { _id : new ObjectId(order.product_id)});
-         console.log("product nya sisa : ",product.stock);
-         
-         if(order){
-            order.status = "Success";
-            product.stock = product.stock - order.quantity;
-            await Manager.save(Order, order);
-            await Manager.save(Product, product);
-          }
+        // ubah ke checkout
+         processOrderQueue();
       }
       break;
       case 'payment_intent.created':
       const paymentIntentCreated = event.data.object;
       if(paymentIntentCreated){
-       console.log("berhasil payment created");
+
       }
       break;
       case 'payment_intent.succeeded':
       const paymentIntentSucceeded = event.data.object;
       if(paymentIntentSucceeded){
-        console.log("berhasil payment success");
+
       }
       break;
     default:
