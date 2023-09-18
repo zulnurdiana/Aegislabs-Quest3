@@ -1,0 +1,85 @@
+<!-- views/cart.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keranjang Belanja</title>
+  <link rel="stylesheet" href="/css/tailwind.css">
+</head>
+
+<body class="bg-gray-100 p-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-semibold">Keranjang Belanja</h1>
+    <a href="/dashboard" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Kembali ke
+      Dashboard</a>
+  </div>
+
+  <div class="grid grid-cols-4 gap-4">
+    <% if (products.length> 0) { %>
+      <% products.forEach(function (productArray) { %>
+        <% productArray.forEach(function (product) { %>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <% if (product.img_url) { %>
+              <img src="<%= product.img_url %>" alt="Gambar Produk" class="w-full h-auto">
+              <% } %>
+                <div class="p-4">
+                  <h2 class="text-xl font-semibold mb-2">
+                    <%= product.nama_produk %>
+                  </h2>
+                  <h3 class="text-green-500 my-2">SGD <%= product.price %>
+                  </h3>
+                  <p class="text-justify font-black mb-2">Tersisa <%= product.stock %> pcs</p>
+                  <p class="text-justify">
+                    <%= product.description %>
+                  </p>
+                </div>
+          </div>
+          <% }); %>
+            <% }); %>
+              <% } else { %>
+                <p class="col-span-4 mt-4">Keranjang belanja Anda kosong.</p>
+                <% } %>
+  </div>
+
+  <div class="flex justify-center mt-4">
+    <form action="/checkout" method="POST" id="checkoutForm">
+      <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Checkout Semua Keranjang
+      </button>
+    </form>
+  </div>
+
+
+
+  <script>
+    document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Mengirim permintaan fetch untuk checkout
+      try {
+        const response = await fetch('/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const responseData = await response.json();
+
+        if (response.status === 200) {
+          // Redirect ke halaman checkout atau tampilkan pesan sukses
+          window.location.href = responseData.url;
+        } else {
+          alert(responseData.message);
+        }
+      } catch (error) {
+        console.error('Terjadi kesalahan:', error);
+        alert('Terjadi kesalahan saat melakukan checkout.');
+      }
+    });
+  </script>
+</body>
+
+</html>

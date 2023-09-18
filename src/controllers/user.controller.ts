@@ -123,6 +123,13 @@ export const Logout = async(req : Request,res : Response) => {
         try {
             await Manager.update(User, {_id : userId}, {refresh_token : null})
             res.clearCookie("refreshToken");
+            req.session.destroy((err) => {
+                if (err) {
+                console.error('Gagal logout:', err);
+                } else {
+                console.log('Pengguna berhasil logout');
+                }
+            })
             return res.status(200).json({msg : "Berhasil logout"})
         } catch (error) {
             console.log(error.message);

@@ -10,44 +10,64 @@
 </head>
 
 <body class="bg-gray-100 p-4">
-  <div class="flex justify-between items-center mb-4">
-    <h1 class="text-2xl font-semibold">Selamat datang di Dashboard</h1>
+<div class="flex justify-between items-center mb-4">
+  <h1 class="text-2xl font-semibold">Selamat datang di Dashboard</h1>
+  <div>
+    <a href="/keranjang" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Keranjang
+      Belanja</a>
     <button id="logoutButton"
       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Logout</button>
   </div>
+</div>
 
 
+<form id="checkoutForm" action="/checkout" method="POST">
   <div class="grid grid-cols-4 gap-4">
     <% if (products.length> 0) { %>
       <% products.forEach(function (product) { %>
-        <a href="/products/<%= product._id %>" class="text-black">
-          <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <% if (product.img_url) { %>
-              <img src="<%= product.img_url %>" alt="Gambar Produk" class="w-full h-auto">
-              <% } %>
-                <div class="p-4">
-                  <h2 class="text-xl font-semibold mb-2">
-                    <%= product.nama_produk %>
-                  </h2>
-                  <h3 class="text-green-500 my-2">
-                    SGD <%= product.price %>
-                  </h3>
-                  <p class="text-justify font-black mb-2">
-                    Tersisa <%= product.stock %> pcs
-                  </p>
-                  <p class="text-justify">
-                    <%= product.description %>
-                  </p>
-                </div>
-          </div>
-        </a>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+          <!-- Checkbox untuk memilih produk -->
+          <% if (product.img_url) { %>
+            <img src="<%= product.img_url %>" alt="Gambar Produk" class="w-full h-auto">
+            <% } %>
+              <div class="p-4">
+                <h2 class="text-xl font-semibold mb-2">
+                  <%= product.nama_produk %>
+                </h2>
+                <h3 class="text-green-500 my-2">SGD <%= product.price %>
+                </h3>
+                <p class="text-justify font-black mb-2">Tersisa <%= product.stock %> pcs</p>
+                <p class="text-justify">
+                  <%= product.description %>
+                </p>
+              <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6"
+                onclick="addToCart('<%= product._id %>')">Tambah ke Keranjang</button>
+
+              </div>
+        </div>
         <% }); %>
           <% } else { %>
             <p class="col-span-4 mt-4">Tidak ada produk yang tersedia.</p>
             <% } %>
   </div>
-
+ 
+</form>
   <script>
+     async function addToCart(productId) {
+        const response = await fetch(`api/cart/${productId}`, {
+          method: "POST",
+        });
+
+        const responseData = await response.json();
+
+        if (response.status === 200) {
+          alert(responseData.msg);
+        } else {
+          alert(responseData.msg);
+        }
+      }
+
+
     document.getElementById('logoutButton').addEventListener('click', function () {
       fetch('/logout', {
         method: 'DELETE',

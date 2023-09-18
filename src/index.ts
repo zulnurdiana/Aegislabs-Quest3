@@ -8,12 +8,12 @@ import routerProduct from "./routes/product.route";
 import routerOTP from "./routes/otp.route";
 import routerEJS from "./routes/ejs.route";
 import routerPayment from "./routes/payment.route";
+import routerCart from "./routes/cart.route";
 import session from "express-session"
 import path = require("path");
 import cron from "node-cron";
 import { Manager } from "./utils/Manager";
 import { Order } from "./entity/Order";
-import { processOrderQueue } from "./controllers/payment.controller";
 
 
 
@@ -53,10 +53,9 @@ AppDataSource.initialize().then(async () => {
   app.use(routerOTP)
   app.use(routerPayment)
   app.use(routerEJS)
+  app.use(routerCart)
 
-  // cron.schedule('*/20 * * * * *', async () => {
-  // await processOrderQueue();
-  //   });
+
   
 
   cron.schedule('* */30 * * * *', async () => {

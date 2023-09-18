@@ -4,6 +4,7 @@ import { User } from "./entity/User"
 import { Product } from "./entity/Product"
 import { OTP } from "./entity/OTP"
 import { Order } from "./entity/Order"
+import { Cart } from "./entity/Cart"
 
 
 export const AppDataSource = new DataSource({
@@ -11,7 +12,7 @@ export const AppDataSource = new DataSource({
     database: "quest3",
     synchronize: true,
     logging: false,
-    entities: [User,Product,OTP,Order],
+    entities: [User,Product,OTP,Order,Cart],
     migrations: [],
     subscribers: [],
 })
