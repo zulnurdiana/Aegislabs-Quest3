@@ -45,8 +45,6 @@ app.use("/upload", express.static("upload"))
 app.use(express.static('public'));
 
 
-
-
 AppDataSource.initialize().then(async () => {
   app.use(routerUser)
   app.use(routerProduct)
@@ -81,3 +79,6 @@ AppDataSource.initialize().then(async () => {
   })
 
 }).catch(error => console.log(error))
+
+
+export default app;
