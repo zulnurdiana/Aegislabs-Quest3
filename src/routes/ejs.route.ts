@@ -2,10 +2,12 @@ import express from "express";
 import { Product } from "../entity/Product";
 import { Manager } from "../utils/Manager";
 import { Cart } from "../entity/Cart";
+import { AppDataSource } from "../data-source";
 
 const routerEJS = express.Router();
 
-routerEJS.get("/",async (req, res) => {
+AppDataSource.initialize().then(async () => {
+  routerEJS.get("/",async (req, res) => {
   res.render("login.ejs");
 })
 
@@ -55,6 +57,10 @@ routerEJS.get("/keranjang",async (req, res) => {
     }
   }
 })
+
+
+}).catch(error => console.log(error))
+
 
 
 export default routerEJS;
