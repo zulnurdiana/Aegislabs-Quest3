@@ -44,6 +44,8 @@ app.use(session({
 app.use("/upload", express.static("upload"))
 app.use(express.static('public'));
 
+
+AppDataSource.initialize().then(async () => {
   app.use(routerUser)
   app.use(routerProduct)
   app.use(routerOTP)
@@ -54,30 +56,29 @@ app.use(express.static('public'));
 
   
 
-//   cron.schedule('* */30 * * * *', async () => {
-//   const expiredOrders = await Manager.find(Order, {
-//     where: {
-//       status: 'Pending',
-//     },
-//   });
+  cron.schedule('* */30 * * * *', async () => {
+  const expiredOrders = await Manager.find(Order, {
+    where: {
+      status: 'Pending',
+    },
+  });
 
 
-//   for (const order of expiredOrders) {
-//     console.log(`Membatalkan pesanan dengan ID ${order._id}`);
-//     order.status = 'Cancelled';
-//     await Manager.save(Order, order);
-//   }
+  for (const order of expiredOrders) {
+    console.log(`Membatalkan pesanan dengan ID ${order._id}`);
+    order.status = 'Cancelled';
+    await Manager.save(Order, order);
+  }
 
-//   console.log('Cron job: Pesanan yang melebihi 30 menit telah dibatalkan.');
-// });
+  console.log('Cron job: Pesanan yang melebihi 30 menit telah dibatalkan.');
+});
 
 
-app.listen(port, () => {
+  app.listen(port, () => {
     console.log(`server running at http://localhost:${port}`);
   })
 
-
-
+}).catch(error => console.log(error))
 
 
 export default app;
